@@ -1,14 +1,13 @@
-# Next.js 15 Starter (tailwind) [[LIVE DEMO](https://thesalmankhxn/vTrades/FrontendDeveloperTask.vercel.app/)]
+# Existing Users/Credentials or You can use Github or Google login
+1. **Tyler Durden**
+    - Email: `tylerdurden@fightclub.com`
+    - Password: `password123`
+    - UID: `on7zjqhpY7ZN64IuB63M47X8zrg2`
 
-![MIT License](https://img.shields.io/badge/license-MIT-blue) [![TypeScript](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://typescriptlang.org) ![ESLint](https://img.shields.io/badge/code%20style-eslint-brightgreen) ![GitHub stars](https://img.shields.io/github/stars/siddharthamaity/thesalmankhxn/vTrades/FrontendDeveloperTask?style=social) ![GitHub forks](https://img.shields.io/github/forks/siddharthamaity/thesalmankhxn/vTrades/FrontendDeveloperTask?style=social) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/siddharthamaity)
-
-*This is the Tailwind version for Next.js 15 Starter, you may be interested in other templates too -*
-- [**Next.js 15 Starter Core**](https://github.com/SiddharthaMaity/nextjs-15-starter-core)
-- [**Next.js 15 Starter with Shadcn UI**](https://github.com/SiddharthaMaity/nextjs-15-starter-shadcn)
-
-Welcome to the **Next.js 15 Starter** repository! This starter template is built with Next.js 15, React 19, TypeScript 5, Tailwind CSS 4 and comes packed with several powerful tools and configurations to accelerate your project setup and streamline development workflows using VS Code.
-
-![Next.js 15 Starter](public/images/screenshot.png)
+2. **Test User**
+    - Email: `test@example.com`
+    - Password: `test123`
+    - UID: `test-user-123`
 
 ## 🚀 What's Included
 
@@ -23,44 +22,6 @@ Welcome to the **Next.js 15 Starter** repository! This starter template is built
 - **Next.js Bundle Analyzer**
 - **Dockerfile** with Node.js 22.16.0 (Alpine)
 - **Dockerfile.bun** with Bun 1.2.17 (Alpine)
-
-### 🛠️ ESLint Plugins
-
-- [**@eslint/js**](https://www.npmjs.com/package/@eslint/js)
-- [**typescript-eslint**](https://github.com/typescript-eslint/typescript-eslint)
-- [**eslint-plugin-react**](https://github.com/jsx-eslint/eslint-plugin-react)
-- [**@next/eslint-plugin-next**](https://github.com/vercel/next.js)
-- [**eslint-config-prettier**](eslint-config-prettier)
-- [**eslint-plugin-tailwindcss**](https://github.com/francoismassart/eslint-plugin-tailwindcss)
-- [**eslint-plugin-import**](https://github.com/import-js/eslint-plugin-import)
-- [**eslint-plugin-promise**](https://github.com/eslint-community/eslint-plugin-promise)
-
-### ✨ Prettier Plugins
-
-- [**@trivago/prettier-plugin-sort-imports**](https://github.com/trivago/prettier-plugin-sort-imports)
-- [**prettier-plugin-tailwindcss**](https://github.com/tailwindlabs/prettier-plugin-tailwindcss)
-
-### 💻 VS Code Extensions (Recommended)
-
-To enhance development experience, install the following VS Code extensions:
-
-- [**Auto Close Tag**](https://marketplace.visualstudio.com/items?itemName=formulahendry.auto-close-tag)
-- [**Better Comments**](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments)
-- [**DotENV**](https://marketplace.visualstudio.com/items?itemName=mikestead.dotenv)
-- [**EditorConfig for VS Code**](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
-- [**ESLint**](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-- [**formate: CSS/LESS/SCSS formatter**](https://marketplace.visualstudio.com/items?itemName=MikeBovenlander.formate)
-- [**Git History**](https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory)
-- [**Import Cost**](https://marketplace.visualstudio.com/items?itemName=wix.vscode-import-cost)
-- [**JavaScript Booster**](https://marketplace.visualstudio.com/items?itemName=sburg.vscode-javascript-booster)
-- [**npm Intellisense**](https://marketplace.visualstudio.com/items?itemName=christian-kohler.npm-intellisense)
-- [**Prettier - Code formatter**](https://marketplace.visualstudio.com/items?itemName=esbenp)
-- [**Todo Tree**](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.todo-tree)
-- [**Turbo Console Log**](https://marketplace.visualstudio.com/items?itemName=ChakrounAnas.turbo-console-log)
-- [**Package Json Upgrade**](https://marketplace.visualstudio.com/items?itemName=codeandstuff.package-json-upgrade)
-- [**Visual Studio Code Commitizen Support**](https://marketplace.visualstudio.com/items?itemName=KnisterPeter.vscode-commitizen)
-- [**Markdown All in One**](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one)
-
 
 ## 🏁 Getting Started
 
@@ -110,18 +71,6 @@ To enhance development experience, install the following VS Code extensions:
     # or with Bun
     bun run build
     ```
-
-### 🐳 Docker Setup
-
-To use Docker, make sure Docker is installed on your machine. Then, build and run the Docker container:
-
-```bash
-docker build . -t nextjs-starter-tailwind
-# or if using Bun
-docker build . -t nextjs-starter-tailwind -f Dockerfile.bun
-
-docker run -p 3000:3000 nextjs-starter-tailwind
-```
 
 ### ☁ Try it in the Cloud
 
@@ -234,20 +183,58 @@ You can register new users through the sign-up form. The system will:
 
 ```
 src/
-├── app/api/auth/
-│   ├── sign-in/route.ts      # Mock sign-in API
-│   └── sign-up/route.ts      # Mock sign-up API
-├── lib/
-│   ├── firebase.config.ts    # Firebase configuration
-│   └── storage.ts            # LocalStorage utilities
+├── app/
+│   ├── (auth)/
+│   │   ├── layout.tsx                    # Auth layout wrapper
+│   │   ├── sign-in/page.tsx              # Sign-in page
+│   │   ├── sign-up/page.tsx              # Sign-up page
+│   │   ├── forgot-password/page.tsx      # Forgot password page
+│   │   ├── otp-verification/page.tsx     # OTP verification page
+│   │   └── create-new-password/page.tsx  # Create new password page
+│   ├── api/auth/
+│   │   ├── sign-in/route.ts              # Mock sign-in API
+│   │   └── sign-up/route.ts              # Mock sign-up API
+│   ├── dashboard/
+│   │   ├── layout.tsx                    # Dashboard layout
+│   │   └── page.tsx                      # Dashboard page
+│   ├── layout.tsx                        # Root layout
+│   ├── page.tsx                          # Home page
+│   ├── globals.css                       # Global styles
+│   └── fonts/                            # Font files
+├── components/
+│   ├── ui/                               # Reusable UI components
+│   │   ├── avatar.tsx                    # Avatar component
+│   │   ├── button.tsx                    # Button component
+│   │   ├── card.tsx                      # Card component
+│   │   ├── checkbox.tsx                  # Checkbox component
+│   │   ├── dialog.tsx                    # Dialog component
+│   │   ├── dropdown-menu.tsx             # Dropdown menu component
+│   │   ├── form.tsx                      # Form component
+│   │   ├── icons.tsx                     # Icon components
+│   │   ├── input.tsx                     # Input component
+│   │   ├── label.tsx                     # Label component
+│   │   ├── separator.tsx                 # Separator component
+│   │   ├── sheet.tsx                     # Sheet component
+│   │   ├── skeleton.tsx                  # Skeleton component
+│   │   ├── spinner.tsx                   # Spinner component
+│   │   └── tooltip.tsx                   # Tooltip component
+│   ├── modal.tsx                         # Modal component
+│   └── show.tsx                          # Show component
 ├── hooks/
-│   └── use-auth.ts           # Hybrid auth hook
+│   ├── use-auth.ts                       # Hybrid auth hook
+│   ├── use-profile.ts                    # Profile management hook
+│   └── use-mobile.ts                     # Mobile detection hook
+├── lib/
+│   ├── firebase.config.ts                # Firebase configuration
+│   ├── storage.ts                        # LocalStorage utilities
+│   ├── constant.ts                       # Application constants
+│   └── utils.ts                          # Utility functions
 ├── stores/
-│   ├── useAuthStore.ts       # Auth state management
-│   └── useProfileStore.ts    # Profile state management
-└── app/(auth)/
-    ├── sign-in/page.tsx      # Sign-in page
-    └── sign-up/page.tsx      # Sign-up page
+│   ├── use-auth-store.ts                 # Auth state management
+│   └── use-profile-store.ts              # Profile state management
+└── assets/
+    └── images/
+        └── banner.png                    # Banner image
 ```
 
 ### Key Features
