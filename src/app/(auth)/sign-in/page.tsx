@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-
 import Link from 'next/link';
 
+import { Show } from '@/components/show';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { GithubIcon, GoogleIcon } from '@/components/ui/icons';
@@ -98,7 +97,9 @@ const SignInPage = () => {
                                 })}
                                 className={cn(errors.email && 'border-red-500')}
                             />
-                            {errors.email && <span className='text-sm text-red-500'>{errors.email.message}</span>}
+                            <Show when={!!errors.email} fallback={null}>
+                                <span className='text-sm text-red-500'>{errors.email?.message}</span>
+                            </Show>
                         </div>
 
                         <div className='grid gap-2'>
@@ -118,7 +119,9 @@ const SignInPage = () => {
                                     className={cn(errors.password && 'border-red-500')}
                                 />
                             </div>
-                            {errors.password && <span className='text-sm text-red-500'>{errors.password.message}</span>}
+                            <Show when={!!errors.password} fallback={null}>
+                                <span className='text-sm text-red-500'>{errors.password?.message}</span>
+                            </Show>
 
                             <div className='mt-1 flex items-center'>
                                 <div className='flex items-center gap-2'>
@@ -177,12 +180,12 @@ const SignInPage = () => {
                     <div className='mt-6 flex items-center justify-center gap-2'>
                         <span className='text-xs text-white'>Don&apos;t have an account?</span>
                         <Link
-                            href='/signup'
+                            href='/sign-up'
                             className={buttonVariants({
                                 variant: 'link',
                                 className: 'w-fit pl-0 text-left text-xs font-semibold'
                             })}>
-                            Sign up
+                            Sign Up
                         </Link>
                     </div>
                 </div>
