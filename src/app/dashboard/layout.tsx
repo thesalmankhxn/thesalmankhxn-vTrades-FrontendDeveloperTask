@@ -23,7 +23,7 @@ interface DashboardLayoutProps {
  * @returns JSX.Element - The dashboard layout structure
  */
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-    const { logout, token } = useAuth();
+    const { logout, token, isLoading } = useAuth();
     const router = useRouter();
 
     /**
@@ -31,15 +31,16 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
      * Runs on component mount and when token changes
      */
     useEffect(() => {
+        if (!window || !token || isLoading) return;
         // If no token is present, redirect to sign-in page
         if (!token) {
             console.log('No authentication token found, redirecting to sign-in');
             router.push('/sign-in');
         }
-    }, [token, router]);
+    }, [token]);
 
     // Show loading state while checking authentication
-    if (!token) {
+    if (isLoading) {
         return (
             <div className='relative grid h-screen w-full place-items-center'>
                 <div className='flex flex-col items-center gap-2'>

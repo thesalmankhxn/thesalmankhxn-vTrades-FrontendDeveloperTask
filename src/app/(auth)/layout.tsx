@@ -1,9 +1,12 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import banner from '@/assets/images/banner.png';
+import { useAuth } from '@/hooks/use-auth';
 import { AUTH_LAYOUT_INFO, AUTH_LAYOUT_TYPE } from '@/lib/constant';
 
 /**
@@ -31,8 +34,18 @@ const FEATURES_LIST = [
  * @returns JSX.Element - The authentication layout structure
  */
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
+    const { token } = useAuth();
+    const router = useRouter();
     const currentPath = usePathname();
     const { title, subtext } = AUTH_LAYOUT_INFO(currentPath.replace(/^\//, '') as AUTH_LAYOUT_TYPE);
+
+    // Redirect to dashboard if user is already authenticated
+    useEffect(() => {
+        if (!!window && token) {
+            router.push('/dashboard');
+        }
+    }, []);
+
     return (
         <div className='m-auto grid h-dvh w-full max-w-[1440px] p-10'>
             <div className='flex flex-col items-center justify-center text-white md:flex-row'>
