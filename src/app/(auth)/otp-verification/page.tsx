@@ -55,8 +55,8 @@ const OTPVerificationPage = () => {
             // Reset form on successful verification
             reset();
 
-            // Redirect to dashboard or next step
-            router.push('/dashboard');
+            // Redirect to create new password page
+            router.push('/create-new-password');
         } catch (error) {
             // Error handling is done in the hook
             console.error('OTP verification failed:', error);
