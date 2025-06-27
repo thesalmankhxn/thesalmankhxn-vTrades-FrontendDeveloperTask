@@ -20,7 +20,6 @@ export const metadata: Metadata = {
     description: 'Comprehensive employee management system with performance tracking and attendance management',
     keywords: 'employee management, HR, performance tracking, attendance, workforce',
     authors: [{ name: 'vTrades Team' }],
-    viewport: 'width=device-width, initial-scale=1',
     robots: 'index, follow'
 };
 
