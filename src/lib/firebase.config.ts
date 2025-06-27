@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { GithubAuthProvider, GoogleAuthProvider, getAuth } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 
 /**
  * Firebase configuration object using Next.js environment variables
@@ -20,8 +20,4 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase Auth
 const auth = getAuth(app);
 
-// Initialize authentication providers
-const googleProvider = new GoogleAuthProvider();
-const githubProvider = new GithubAuthProvider();
-
-export { auth, googleProvider, githubProvider };
+export { auth };

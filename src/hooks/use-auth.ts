@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { auth, githubProvider, googleProvider } from '@/lib/firebase.config';
+import { auth } from '@/lib/firebase.config';
 import {
     clearAllAuthData,
     getAuthFromStorage,
@@ -17,7 +17,7 @@ import {
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 
-import { signInWithPopup, signOut } from 'firebase/auth';
+import { GithubAuthProvider, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { toast } from 'sonner';
 
 /**
@@ -30,6 +30,10 @@ export const useAuth = () => {
     const { token, setAuthenticated, logout: logoutFromStore } = useAuthStore();
     const { setProfile, clearProfile } = useProfileStore();
     const router = useRouter();
+
+    // Initialize authentication providers
+    const googleProvider = new GoogleAuthProvider();
+    const githubProvider = new GithubAuthProvider();
 
     /**
      * Initialize auth state from localStorage on mount
