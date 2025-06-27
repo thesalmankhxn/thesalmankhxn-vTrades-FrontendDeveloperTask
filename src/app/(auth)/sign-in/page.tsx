@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 
 import { useForm } from 'react-hook-form';
 
-interface LoginFormData {
+interface SignInFormData {
     email: string;
     password: string;
 }
@@ -29,7 +29,7 @@ const SignInPage = () => {
         handleSubmit,
         formState: { errors, isValid },
         reset
-    } = useForm<LoginFormData>({
+    } = useForm<SignInFormData>({
         mode: 'onChange', // Validate on change for better UX
         defaultValues: {
             email: '',
@@ -40,7 +40,7 @@ const SignInPage = () => {
     /**
      * Handles form submission for email/password login
      */
-    const onSubmit = async (data: LoginFormData) => {
+    const onSubmit = async (data: SignInFormData) => {
         try {
             await loginWithEmailPassword(data.email, data.password);
 
