@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Modal } from '@/components/modal';
 import { Show } from '@/components/show';
 import { Button } from '@/components/ui/button';
-import { CheckedIcon, EmailIcon } from '@/components/ui/icons';
+import { CheckedIcon } from '@/components/ui/icons';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/use-auth';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * Dashboard page component
  * Main dashboard interface for authenticated users

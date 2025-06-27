@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import type { Metadata } from 'next';
 import { Source_Sans_3 } from 'next/font/google';
