@@ -1,10 +1,17 @@
+import React from 'react';
+
+import { redirect } from 'next/navigation';
+
 /**
- * The main page component that renders the HomePage component.
+ * Home page component that serves as the main entry point
+ * Redirects users to the appropriate section based on authentication status
  *
- * @returns {JSX.Element} The rendered HomePage component.
+ * @returns JSX.Element - Redirect component (will redirect before rendering)
  */
-const Page = () => {
-    return <div>Hello World</div>;
+const HomePage = () => {
+    // For now, redirect to the protected dashboard
+    // In a real app, you would check authentication status here
+    redirect('/dashboard');
 };
 
-export default Page;
+export default HomePage;

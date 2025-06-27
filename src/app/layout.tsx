@@ -7,7 +7,7 @@ import { ThemeProvider } from 'next-themes';
 
 import '@/app/globals.css';
 
-// Import Source Sans Pro from Google Fonts
+// Import Source Sans Pro from Google Fonts with proper configuration
 const sourceSansPro = Source_Sans_3({
     subsets: ['latin'],
     variable: '--font-source-sans-pro',
@@ -16,18 +16,31 @@ const sourceSansPro = Source_Sans_3({
 });
 
 export const metadata: Metadata = {
-    title: 'vTrades',
-    description: 'vTrades'
+    title: 'vTrades - Employee Management Platform',
+    description: 'Comprehensive employee management system with performance tracking and attendance management',
+    keywords: 'employee management, HR, performance tracking, attendance, workforce',
+    authors: [{ name: 'vTrades Team' }],
+    viewport: 'width=device-width, initial-scale=1',
+    robots: 'index, follow'
 };
 
-const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
+/**
+ * Root layout component that wraps the entire application
+ * Provides theme context, global styling, error boundary, and React provider
+ *
+ * @param children - React components to be rendered
+ * @returns JSX.Element - The root layout structure
+ */
+const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
     return (
         <html suppressHydrationWarning lang='en'>
-            <body className={`${sourceSansPro.variable} bg-background text-foreground antialiased`}>
-                <ThemeProvider attribute='class'>{children}</ThemeProvider>
+            <body className={`${sourceSansPro.variable} bg-primary-bg text-foreground antialiased`}>
+                <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+                    {children}
+                </ThemeProvider>
             </body>
         </html>
     );
 };
 
-export default Layout;
+export default RootLayout;
