@@ -13,12 +13,12 @@ interface AdminType {
 
 interface State {
     admin: AdminType | null;
-    clearProfile: () => void;
 }
 
 interface Actions {
     setProfile: (admin: AdminType) => void;
     setProfileFromFirebaseUser: (user: User) => void;
+    clearProfile: () => void;
 }
 
 export const useProfileStore = create<State & Actions>()(

@@ -19,7 +19,7 @@ interface SignUpFormData {
 }
 
 const SignUpPage = () => {
-    const { isLoading, loginWithGoogle, loginWithGithub } = useAuth();
+    const { isLoading, signupWithEmailPassword, loginWithGoogle, loginWithGithub } = useAuth();
 
     /**
      * React Hook Form setup with validation
@@ -43,19 +43,19 @@ const SignUpPage = () => {
     const password = watch('password');
 
     /**
-     * Handles form submission for email/password login
+     * Handles form submission for email/password signup
      */
     const onSubmit = async (data: SignUpFormData) => {
         try {
-            // await loginWithEmailPassword(data.email, data.password);
+            await signupWithEmailPassword(data.email, data.password);
 
-            // Reset form on successful login
+            // Reset form on successful signup
             reset();
 
             // Redirect is handled in the useAuth hook
         } catch (error) {
             // Error handling is done in the hook
-            console.error('Login failed:', error);
+            console.error('Signup failed:', error);
         }
     };
 
@@ -82,6 +82,7 @@ const SignUpPage = () => {
             console.error('GitHub login failed:', error);
         }
     };
+
     return (
         <>
             <form className='w-full' onSubmit={handleSubmit(onSubmit)}>
@@ -102,7 +103,9 @@ const SignUpPage = () => {
                                 })}
                                 className={cn(errors.email && 'border-red-500')}
                             />
-                            {errors.email && <span className='text-sm text-red-500'>{errors.email.message}</span>}
+                            <Show when={!!errors.email} fallback={null}>
+                                <span className='text-sm text-red-500'>{errors.email?.message}</span>
+                            </Show>
                         </div>
 
                         <div className='grid gap-2'>
@@ -117,11 +120,6 @@ const SignUpPage = () => {
                                     minLength: {
                                         value: 6,
                                         message: 'Password must be at least 6 characters'
-                                    },
-                                    pattern: {
-                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                                        message:
-                                            'Password must contain at least one uppercase letter, one lowercase letter, and one number'
                                     }
                                 })}
                                 className={cn(errors.password && 'border-red-500')}
@@ -154,7 +152,7 @@ const SignUpPage = () => {
                             type='submit'
                             className='mt-4 w-full'
                             disabled={isLoading || !isValid}>
-                            Sign In
+                            Sign Up
                         </Button>
                     </div>
 

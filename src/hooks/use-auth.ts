@@ -5,71 +5,67 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { auth, githubProvider, googleProvider } from '@/lib/firebase.config';
+import {
+    clearAllAuthData,
+    getAuthFromStorage,
+    getProfileFromStorage,
+    removeAuthFromStorage,
+    removeProfileFromStorage,
+    saveAuthToStorage,
+    saveProfileToStorage
+} from '@/lib/storage';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 
-import {
-    createUserWithEmailAndPassword,
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    signInWithPopup,
-    signOut,
-    updateProfile
-} from 'firebase/auth';
+import { signInWithPopup, signOut } from 'firebase/auth';
 import { toast } from 'sonner';
 
 /**
  * Custom hook for handling authentication operations
- * Provides email/password, Google, and GitHub login/signup functionality
- * Integrates with Zustand store for token and profile management
+ * Uses mock APIs for email/password authentication and Firebase for OAuth
+ * Integrates with Zustand store and localStorage for token and profile management
  */
 export const useAuth = () => {
     const [isLoading, setIsLoading] = useState(false);
     const { token, setAuthenticated, logout: logoutFromStore } = useAuthStore();
-    const { setProfileFromFirebaseUser, clearProfile } = useProfileStore();
+    const { setProfile, clearProfile } = useProfileStore();
     const router = useRouter();
 
     /**
-     * Sync Firebase auth state with Zustand store
-     * This ensures the store is updated when Firebase auth state changes
+     * Initialize auth state from localStorage on mount
+     * This ensures persistence across page refreshes
      */
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    // Get the user's ID token
-                    const idToken = await user.getIdToken();
-                    setAuthenticated(idToken);
+        const initializeAuth = () => {
+            try {
+                // Check for existing auth data in localStorage
+                const storedAuth = getAuthFromStorage();
+                const storedProfile = getProfileFromStorage();
 
-                    // Save profile data to store
-                    setProfileFromFirebaseUser(user);
-                } catch (error) {
-                    console.error('Error getting user token:', error);
-                    logoutFromStore();
-                    clearProfile();
+                if (storedAuth?.token && storedProfile?.admin) {
+                    // Restore auth state from localStorage
+                    setAuthenticated(storedAuth.token);
+                    setProfile(storedProfile.admin);
                 }
-            } else {
-                // User is signed out
-                logoutFromStore();
-                clearProfile();
+            } catch (error) {
+                console.error('Error initializing auth state:', error);
+                // Clear any corrupted data
+                clearAllAuthData();
             }
-        });
+        };
 
-        // Cleanup subscription on unmount
-        return () => unsubscribe();
-    }, [setAuthenticated, logoutFromStore, setProfileFromFirebaseUser, clearProfile]);
+        initializeAuth();
+    }, [setAuthenticated, setProfile]);
 
     /**
-     * Handles email/password signup using Firebase
+     * Handles email/password signup using mock API
      * @param email - User's email address
      * @param password - User's password
-     * @param firstName - User's first name
-     * @param lastName - User's last name
      * @returns Promise that resolves on successful signup
      */
-    const signupWithEmailPassword = async (email: string, password: string, firstName: string, lastName: string) => {
+    const signupWithEmailPassword = async (email: string, password: string) => {
         // Validate input fields
-        if (!email || !password || !firstName || !lastName) {
+        if (!email || !password) {
             toast.error('Please fill in all fields');
             return;
         }
@@ -90,46 +86,44 @@ export const useAuth = () => {
         setIsLoading(true);
 
         try {
-            // Create user with email and password
-            const result = await createUserWithEmailAndPassword(auth, email, password);
-
-            // Update user profile with display name
-            await updateProfile(result.user, {
-                displayName: `${firstName} ${lastName}`
+            // Call mock signup API
+            const response = await fetch('/api/auth/sign-up', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email,
+                    password
+                })
             });
 
-            console.log('Signup successful:', result.user.email);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Signup failed');
+            }
+
+            // Save auth and profile data to localStorage
+            saveAuthToStorage(data.auth);
+            saveProfileToStorage(data.profile);
+
+            // Update Zustand stores
+            setAuthenticated(data.auth.token);
+            setProfile(data.profile.admin);
+
+            console.log('Signup successful:', data.profile.admin.email);
             toast.success('Account created successfully! Welcome!');
 
             // Redirect to home page
             router.push('/');
 
-            return result;
+            return data;
         } catch (error: unknown) {
             console.error('Signup error:', error);
 
-            // Handle specific Firebase auth errors
-            if (error && typeof error === 'object' && 'code' in error) {
-                const errorCode = error.code as string;
-                switch (errorCode) {
-                    case 'auth/email-already-in-use':
-                        toast.error('An account with this email already exists');
-                        break;
-                    case 'auth/invalid-email':
-                        toast.error('Invalid email address');
-                        break;
-                    case 'auth/operation-not-allowed':
-                        toast.error('Email/password accounts are not enabled. Please contact support');
-                        break;
-                    case 'auth/weak-password':
-                        toast.error('Password is too weak. Please choose a stronger password');
-                        break;
-                    case 'auth/too-many-requests':
-                        toast.error('Too many failed attempts. Please try again later');
-                        break;
-                    default:
-                        toast.error('Signup failed. Please try again');
-                }
+            if (error instanceof Error) {
+                toast.error(error.message);
             } else {
                 toast.error('Signup failed. Please try again');
             }
@@ -140,7 +134,7 @@ export const useAuth = () => {
     };
 
     /**
-     * Handles email/password authentication using Firebase
+     * Handles email/password authentication using mock API
      * @param email - User's email address
      * @param password - User's password
      * @returns Promise that resolves on successful login
@@ -162,40 +156,44 @@ export const useAuth = () => {
         setIsLoading(true);
 
         try {
-            // Attempt to sign in with email and password
-            const result = await signInWithEmailAndPassword(auth, email, password);
-            console.log('Login successful:', result.user.email);
+            // Call mock signin API
+            const response = await fetch('/api/auth/sign-in', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Login failed');
+            }
+
+            // Save auth and profile data to localStorage
+            saveAuthToStorage(data.auth);
+            saveProfileToStorage(data.profile);
+
+            // Update Zustand stores
+            setAuthenticated(data.auth.token);
+            setProfile(data.profile.admin);
+
+            console.log('Login successful:', data.profile.admin.email);
             toast.success('Login successful! Welcome back!');
 
             // Redirect to home page
             router.push('/');
 
-            return result;
+            return data;
         } catch (error: unknown) {
             console.error('Login error:', error);
 
-            // Handle specific Firebase auth errors
-            if (error && typeof error === 'object' && 'code' in error) {
-                const errorCode = error.code as string;
-                switch (errorCode) {
-                    case 'auth/user-not-found':
-                        toast.error('No account found with this email address');
-                        break;
-                    case 'auth/wrong-password':
-                        toast.error('Incorrect password. Please try again');
-                        break;
-                    case 'auth/invalid-email':
-                        toast.error('Invalid email address');
-                        break;
-                    case 'auth/user-disabled':
-                        toast.error('This account has been disabled');
-                        break;
-                    case 'auth/too-many-requests':
-                        toast.error('Too many failed attempts. Please try again later');
-                        break;
-                    default:
-                        toast.error('Login failed. Please check your credentials and try again');
-                }
+            if (error instanceof Error) {
+                toast.error(error.message);
             } else {
                 toast.error('Login failed. Please check your credentials and try again');
             }
@@ -214,6 +212,34 @@ export const useAuth = () => {
 
         try {
             const result = await signInWithPopup(auth, googleProvider);
+
+            // Generate mock token for OAuth users
+            const mockToken = `mock-jwt-token-${result.user.uid}-${Date.now()}`;
+
+            // Prepare auth and profile data
+            const authData = {
+                token: mockToken
+            };
+
+            const profileData = {
+                admin: {
+                    uid: result.user.uid,
+                    name: result.user.displayName || result.user.email?.split('@')[0] || 'User',
+                    email: result.user.email || '',
+                    profilePhoto: result.user.photoURL || undefined,
+                    initialPasswordChangeAt: null,
+                    profilePhotoThumbnail: result.user.photoURL ? { url: result.user.photoURL } : undefined
+                }
+            };
+
+            // Save auth and profile data to localStorage
+            saveAuthToStorage(authData);
+            saveProfileToStorage(profileData);
+
+            // Update Zustand stores
+            setAuthenticated(authData.token);
+            setProfile(profileData.admin);
+
             console.log('Google login successful:', result.user.email);
             toast.success('Login successful! Welcome back!');
 
@@ -258,6 +284,34 @@ export const useAuth = () => {
 
         try {
             const result = await signInWithPopup(auth, githubProvider);
+
+            // Generate mock token for OAuth users
+            const mockToken = `mock-jwt-token-${result.user.uid}-${Date.now()}`;
+
+            // Prepare auth and profile data
+            const authData = {
+                token: mockToken
+            };
+
+            const profileData = {
+                admin: {
+                    uid: result.user.uid,
+                    name: result.user.displayName || result.user.email?.split('@')[0] || 'User',
+                    email: result.user.email || '',
+                    profilePhoto: result.user.photoURL || undefined,
+                    initialPasswordChangeAt: null,
+                    profilePhotoThumbnail: result.user.photoURL ? { url: result.user.photoURL } : undefined
+                }
+            };
+
+            // Save auth and profile data to localStorage
+            saveAuthToStorage(authData);
+            saveProfileToStorage(profileData);
+
+            // Update Zustand stores
+            setAuthenticated(authData.token);
+            setProfile(profileData.admin);
+
             console.log('GitHub login successful:', result.user.email);
             toast.success('Login successful! Welcome back!');
 
@@ -298,17 +352,29 @@ export const useAuth = () => {
 
     /**
      * Handles user logout
-     * Signs out from Firebase and clears the store
+     * Clears localStorage and Zustand stores
      */
     const logout = async () => {
         setIsLoading(true);
 
         try {
-            console.log('Starting Firebase logout...');
-            await signOut(auth);
-            console.log('Firebase signOut completed successfully');
+            console.log('Starting logout...');
 
-            // Store will be automatically cleared by onAuthStateChanged listener
+            // Sign out from Firebase if user was authenticated via OAuth
+            try {
+                await signOut(auth);
+            } catch (firebaseError) {
+                console.log('Firebase signout error (expected for mock auth users):', firebaseError);
+            }
+
+            // Clear localStorage
+            clearAllAuthData();
+
+            // Clear Zustand stores
+            logoutFromStore();
+            clearProfile();
+
+            console.log('Logout completed successfully');
             toast.success('Logged out successfully');
 
             // Redirect to Sign In page

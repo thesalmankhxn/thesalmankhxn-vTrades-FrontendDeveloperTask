@@ -19,7 +19,7 @@ interface LoginFormData {
 }
 
 const SignInPage = () => {
-    const { isLoading, loginWithGoogle, loginWithGithub } = useAuth();
+    const { isLoading, loginWithEmailPassword, loginWithGoogle, loginWithGithub } = useAuth();
 
     /**
      * React Hook Form setup with validation
@@ -42,7 +42,7 @@ const SignInPage = () => {
      */
     const onSubmit = async (data: LoginFormData) => {
         try {
-            // await loginWithEmailPassword(data.email, data.password);
+            await loginWithEmailPassword(data.email, data.password);
 
             // Reset form on successful login
             reset();
