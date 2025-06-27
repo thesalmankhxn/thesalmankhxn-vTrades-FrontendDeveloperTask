@@ -9,13 +9,11 @@ import {
     clearAllAuthData,
     getAuthFromStorage,
     getProfileFromStorage,
-    removeAuthFromStorage,
-    removeProfileFromStorage,
     saveAuthToStorage,
     saveProfileToStorage
 } from '@/lib/storage';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useProfileStore } from '@/stores/useProfileStore';
+import { useAuthStore } from '@/stores/use-auth-store';
+import { useProfileStore } from '@/stores/use-profile-store';
 
 import { GithubAuthProvider, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { toast } from 'sonner';
