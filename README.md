@@ -9,6 +9,35 @@
     - Password: `test123`
     - UID: `test-user-123`
 
+# App Flow
+
+## Authentication Flow
+
+### Unauthenticated Users
+- Users are automatically redirected to the `/sign-in` page when accessing protected routes
+- Users can choose between email/password authentication or OAuth providers (Google, GitHub)
+- Successful authentication redirects users to the `/dashboard`
+
+### Authenticated Users
+- Users are automatically redirected to the `/dashboard` when accessing auth pages
+- Protected routes are accessible only to authenticated users
+- Session persistence across browser refreshes using localStorage
+
+### Navigation Structure
+- **Public Routes**: `/sign-in`, `/sign-up`, `/forgot-password`, `/otp-verification`, `/create-new-password`
+- **Protected Routes**: `/dashboard` and all dashboard sub-routes
+- **Fallback**: Unauthorized access attempts redirect to `/sign-in`
+
+### App Flow
+- `/sign-in` > `/dashboard`
+- `/sign-up` > `/sign-in` > `/dashboard`
+- `/forgot-password` > `/otp-verification` > `/create-new-password` > `/dashboard`
+
+### State Management
+- Authentication state is managed globally using Zustand stores
+- Profile data is synchronized across all components
+- Automatic logout on token expiration or manual logout action
+
 ## 🚀 What's Included
 
 - **Next.js 15**
