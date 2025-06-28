@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
 interface CreateNewPasswordFormData {
     password: string;
@@ -21,17 +21,19 @@ interface CreateNewPasswordFormData {
 const CreateNewPasswordPage = () => {
     const { isLoading } = useAuth();
     const router = useRouter();
+
     /**
-     * React Hook Form setup with validation
+     * React Hook Form setup with validation using Controller
      */
     const {
-        register,
+        control,
         handleSubmit,
         formState: { errors, isValid },
         reset,
         watch
     } = useForm<CreateNewPasswordFormData>({
-        mode: 'onChange', // Validate on change for better UX
+        mode: 'onChange',
+        reValidateMode: 'onSubmit',
         defaultValues: {
             password: '',
             confirmPassword: ''
@@ -39,7 +41,7 @@ const CreateNewPasswordPage = () => {
     });
 
     /**
-     * Handles form submission for email/password login
+     * Handles form submission for password creation
      */
     const onSubmit = async (data: CreateNewPasswordFormData) => {
         try {
@@ -65,24 +67,25 @@ const CreateNewPasswordPage = () => {
                     <div className='grid gap-6'>
                         <div className='grid gap-2'>
                             <Label htmlFor='password'>New Password</Label>
-                            <Input
-                                id='password'
-                                type='password'
-                                placeholder='********'
-                                {...register('password', {
+                            <Controller
+                                name='password'
+                                control={control}
+                                rules={{
                                     required: 'Password is required',
                                     minLength: {
                                         value: 8,
                                         message: 'Password must be at least 8 characters long'
-                                    },
-                                    validate: (value) => {
-                                        if (value !== confirmPassword) {
-                                            return 'Oops! Passwords Don’t Match';
-                                        }
-                                        return true;
                                     }
-                                })}
-                                className={cn(errors.password && 'border-red-500')}
+                                }}
+                                render={({ field }) => (
+                                    <Input
+                                        id='password'
+                                        type='password'
+                                        placeholder='********'
+                                        {...field}
+                                        className={cn(errors.password && 'border-red-500')}
+                                    />
+                                )}
                             />
                             <Show when={!!errors.password} fallback={null}>
                                 <span className='text-sm text-red-500'>{errors.password?.message}</span>
@@ -91,20 +94,27 @@ const CreateNewPasswordPage = () => {
 
                         <div className='grid gap-2'>
                             <Label htmlFor='confirmPassword'>Re-enter your new password</Label>
-                            <Input
-                                id='confirmPassword'
-                                type='password'
-                                placeholder='********'
-                                {...register('confirmPassword', {
+                            <Controller
+                                name='confirmPassword'
+                                control={control}
+                                rules={{
                                     required: 'Confirm Password is required',
                                     validate: (value) => {
                                         if (value !== password) {
-                                            return 'Oops! Passwords Don’t Match';
+                                            return "Oops! Passwords Don't Match";
                                         }
                                         return true;
                                     }
-                                })}
-                                className={cn(errors.confirmPassword && 'border-red-500')}
+                                }}
+                                render={({ field }) => (
+                                    <Input
+                                        id='confirmPassword'
+                                        type='password'
+                                        placeholder='********'
+                                        {...field}
+                                        className={cn(errors.confirmPassword && 'border-red-500')}
+                                    />
+                                )}
                             />
                             <Show when={!!errors.confirmPassword} fallback={null}>
                                 <span className='text-sm text-red-500'>{errors.confirmPassword?.message}</span>

@@ -123,18 +123,6 @@ const SignInPage = () => {
                         </Button>
                     </div>
 
-                    <div className='mt-6 flex items-center justify-center gap-2'>
-                        <span className='text-xs text-white'>Don&apos;t have an account?</span>
-                        <Link
-                            href='/sign-up'
-                            className={buttonVariants({
-                                variant: 'link',
-                                className: 'w-fit pl-0 text-left text-xs font-semibold'
-                            })}>
-                            Sign Up
-                        </Link>
-                    </div>
-
                     <div className='flex w-full max-w-[385px] items-center py-11'>
                         <div className='h-px flex-grow bg-[#272727]'></div>
                         <span className='px-4 text-sm text-gray-500'>or</span>
