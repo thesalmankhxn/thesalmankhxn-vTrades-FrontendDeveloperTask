@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { auth } from '@/lib/firebase.config';
 import {
     clearAllAuthData,
     getAuthFromStorage,
@@ -15,12 +14,11 @@ import {
 import { useAuthStore } from '@/stores/use-auth-store';
 import { useProfileStore } from '@/stores/use-profile-store';
 
-import { GithubAuthProvider, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { toast } from 'sonner';
 
 /**
  * Custom hook for handling authentication operations
- * Uses mock APIs for email/password authentication and Firebase for OAuth
+ * Uses mock APIs for email/password authentication
  * Integrates with Zustand store and localStorage for token and profile management
  */
 export const useAuth = () => {
@@ -28,10 +26,6 @@ export const useAuth = () => {
     const { token, setAuthenticated, logout: logoutFromStore } = useAuthStore();
     const { setProfile, clearProfile } = useProfileStore();
     const router = useRouter();
-
-    // Initialize authentication providers
-    const googleProvider = new GoogleAuthProvider();
-    const githubProvider = new GithubAuthProvider();
 
     /**
      * Initialize auth state from localStorage on mount
@@ -206,153 +200,6 @@ export const useAuth = () => {
     };
 
     /**
-     * Handles Google OAuth authentication/signup
-     * @returns Promise that resolves on successful login/signup
-     */
-    const loginWithGoogle = async () => {
-        setIsLoading(true);
-
-        try {
-            const result = await signInWithPopup(auth, googleProvider);
-
-            // Generate mock token for OAuth users
-            const mockToken = `mock-jwt-token-${result.user.uid}-${Date.now()}`;
-
-            // Prepare auth and profile data
-            const authData = {
-                token: mockToken
-            };
-
-            const profileData = {
-                admin: {
-                    uid: result.user.uid,
-                    name: result.user.displayName || result.user.email?.split('@')[0] || 'User',
-                    email: result.user.email || '',
-                    profilePhoto: result.user.photoURL || undefined,
-                    initialPasswordChangeAt: null,
-                    profilePhotoThumbnail: result.user.photoURL ? { url: result.user.photoURL } : undefined
-                }
-            };
-
-            // Save auth and profile data to localStorage
-            saveAuthToStorage(authData);
-            saveProfileToStorage(profileData);
-
-            // Update Zustand stores
-            setAuthenticated(authData.token);
-            setProfile(profileData.admin);
-
-            console.log('Google login successful:', result.user.email);
-            toast.success('Login successful! Welcome back!');
-
-            // Redirect to home page
-            router.push('/');
-
-            return result;
-        } catch (error: unknown) {
-            console.error('Google login error:', error);
-
-            // Handle specific Google auth errors
-            if (error && typeof error === 'object' && 'code' in error) {
-                const errorCode = error.code as string;
-                switch (errorCode) {
-                    case 'auth/popup-closed-by-user':
-                        toast.error('Login cancelled');
-                        break;
-                    case 'auth/popup-blocked':
-                        toast.error('Popup blocked. Please allow popups for this site');
-                        break;
-                    case 'auth/cancelled-popup-request':
-                        toast.error('Login cancelled');
-                        break;
-                    default:
-                        toast.error('Google login failed. Please try again');
-                }
-            } else {
-                toast.error('Google login failed. Please try again');
-            }
-            throw error;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    /**
-     * Handles GitHub OAuth authentication/signup
-     * @returns Promise that resolves on successful login/signup
-     */
-    const loginWithGithub = async () => {
-        setIsLoading(true);
-
-        try {
-            const result = await signInWithPopup(auth, githubProvider);
-
-            // Generate mock token for OAuth users
-            const mockToken = `mock-jwt-token-${result.user.uid}-${Date.now()}`;
-
-            // Prepare auth and profile data
-            const authData = {
-                token: mockToken
-            };
-
-            const profileData = {
-                admin: {
-                    uid: result.user.uid,
-                    name: result.user.displayName || result.user.email?.split('@')[0] || 'User',
-                    email: result.user.email || '',
-                    profilePhoto: result.user.photoURL || undefined,
-                    initialPasswordChangeAt: null,
-                    profilePhotoThumbnail: result.user.photoURL ? { url: result.user.photoURL } : undefined
-                }
-            };
-
-            // Save auth and profile data to localStorage
-            saveAuthToStorage(authData);
-            saveProfileToStorage(profileData);
-
-            // Update Zustand stores
-            setAuthenticated(authData.token);
-            setProfile(profileData.admin);
-
-            console.log('GitHub login successful:', result.user.email);
-            toast.success('Login successful! Welcome back!');
-
-            // Redirect to home page
-            router.push('/');
-
-            return result;
-        } catch (error: unknown) {
-            console.error('GitHub login error:', error);
-
-            // Handle specific GitHub auth errors
-            if (error && typeof error === 'object' && 'code' in error) {
-                const errorCode = error.code as string;
-                switch (errorCode) {
-                    case 'auth/popup-closed-by-user':
-                        toast.error('Login cancelled');
-                        break;
-                    case 'auth/popup-blocked':
-                        toast.error('Popup blocked. Please allow popups for this site');
-                        break;
-                    case 'auth/cancelled-popup-request':
-                        toast.error('Login cancelled');
-                        break;
-                    case 'auth/account-exists-with-different-credential':
-                        toast.error('An account already exists with the same email but different sign-in credentials');
-                        break;
-                    default:
-                        toast.error('GitHub login failed. Please try again');
-                }
-            } else {
-                toast.error('GitHub login failed. Please try again');
-            }
-            throw error;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    /**
      * Handles user logout
      * Clears localStorage and Zustand stores
      */
@@ -361,13 +208,6 @@ export const useAuth = () => {
 
         try {
             console.log('Starting logout...');
-
-            // Sign out from Firebase if user was authenticated via OAuth
-            try {
-                await signOut(auth);
-            } catch (firebaseError) {
-                console.log('Firebase signout error (expected for mock auth users):', firebaseError);
-            }
 
             // Clear localStorage
             clearAllAuthData();
@@ -394,8 +234,6 @@ export const useAuth = () => {
         token,
         signupWithEmailPassword,
         loginWithEmailPassword,
-        loginWithGoogle,
-        loginWithGithub,
         logout
     };
 };
