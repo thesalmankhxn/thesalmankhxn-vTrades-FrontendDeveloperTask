@@ -1,3 +1,5 @@
+### deployed on - https://thesalmankhxn-v-trades-frontend-dev.vercel.app/
+
 # Existing Users/Credentials
 1. **Tyler Durden**
     - Email: `tylerdurden@fightclub.com`
