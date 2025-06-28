@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 
 import { useForm } from 'react-hook-form';
+import { GithubIcon, GoogleIcon } from '@/components/ui/icons';
 
 interface SignInFormData {
     email: string;
@@ -119,6 +120,49 @@ const SignInPage = () => {
                             className='mt-4 w-full'
                             disabled={isLoading || !isValid}>
                             Sign In
+                        </Button>
+                    </div>
+
+                    <div className='mt-6 flex items-center justify-center gap-2'>
+                        <span className='text-xs text-white'>Don&apos;t have an account?</span>
+                        <Link
+                            href='/sign-up'
+                            className={buttonVariants({
+                                variant: 'link',
+                                className: 'w-fit pl-0 text-left text-xs font-semibold'
+                            })}>
+                            Sign Up
+                        </Link>
+                    </div>
+
+                    <div className='flex w-full max-w-[385px] items-center py-11'>
+                        <div className='h-px flex-grow bg-[#272727]'></div>
+                        <span className='px-4 text-sm text-gray-500'>or</span>
+                        <div className='h-px flex-grow bg-[#272727]'></div>
+                    </div>
+
+                    <div className={cn('flex w-full items-center gap-6', 'flex-col justify-between')}>
+                        <Button
+                            variant='outline'
+                            className={cn(
+                                'w-full gap-2 !border-[#30303D] !bg-[#1D1E26] text-sm !font-normal !text-white'
+                            )}
+                            type='button'
+                            // onClick={handleGoogleLogin}
+                            disabled={isLoading}>
+                            <GoogleIcon />
+                            Sign in with Google
+                        </Button>
+                        <Button
+                            variant='outline'
+                            className={cn(
+                                'w-full gap-2 border-[#30303D] !bg-[#1D1E26] text-sm !font-normal !text-white'
+                            )}
+                            type='button'
+                            // onClick={handleGithubLogin}
+                            disabled={isLoading}>
+                            <GithubIcon />
+                            Sign in with Github
                         </Button>
                     </div>
 
