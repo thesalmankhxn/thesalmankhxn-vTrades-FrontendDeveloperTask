@@ -1,4 +1,4 @@
-# Existing Users/Credentials or You can use Github or Google login
+# Existing Users/Credentials
 1. **Tyler Durden**
     - Email: `tylerdurden@fightclub.com`
     - Password: `password123`
@@ -15,7 +15,7 @@
 
 ### Unauthenticated Users
 - Users are automatically redirected to the `/sign-in` page when accessing protected routes
-- Users can choose between email/password authentication or OAuth providers (Google, GitHub)
+- Users can authenticate using email/password
 - Successful authentication redirects users to the `/dashboard`
 
 ### Authenticated Users
@@ -107,15 +107,15 @@
 
 # Hybrid Authentication System
 
-This project now includes a hybrid authentication system that combines mock APIs for email/password authentication with Firebase OAuth for Google and GitHub authentication.
+This project now includes a hybrid authentication system that combines mock APIs for email/password authentication with NextAuth OAuth for Google and GitHub authentication.
 
 ## Features
 
 ### 🔐 Authentication Methods
 
 - **Email/Password**: Mock API endpoints for sign-in and sign-up
-- **Google OAuth**: Firebase Authentication
-- **GitHub OAuth**: Firebase Authentication
+- **Google OAuth**: NextAuth Authentication
+- **GitHub OAuth**: NextAuth Authentication
 
 ### 💾 Local Storage Integration
 
@@ -164,14 +164,14 @@ You can register new users through the sign-up form. The system will:
 
 ### Google OAuth
 
-- Uses Firebase Authentication
+- Uses NextAuth Authentication
 - Stores user data in localStorage for consistency
 - Handles popup blocking and cancellation errors
 - Generates mock tokens for unified state management
 
 ### GitHub OAuth
 
-- Uses Firebase Authentication
+- Uses NextAuth Authentication
 - Stores user data in localStorage for consistency
 - Handles account conflicts and popup errors
 - Generates mock tokens for unified state management
@@ -250,11 +250,10 @@ src/
 │   ├── modal.tsx                         # Modal component
 │   └── show.tsx                          # Show component
 ├── hooks/
-│   ├── use-auth.ts                       # Hybrid auth hook
+│   ├── use-auth.ts                       # Auth hook
 │   ├── use-profile.ts                    # Profile management hook
 │   └── use-mobile.ts                     # Mobile detection hook
 ├── lib/
-│   ├── firebase.config.ts                # Firebase configuration
 │   ├── storage.ts                        # LocalStorage utilities
 │   ├── constant.ts                       # Application constants
 │   └── utils.ts                          # Utility functions
@@ -268,14 +267,14 @@ src/
 
 ### Key Features
 
-1. **Hybrid Authentication**: Mock APIs for email/password, Firebase for OAuth
+1. **Hybrid Authentication**: Mock APIs for email/password, NextAuth for OAuth
 2. **Type Safety**: Full TypeScript support with proper interfaces
 3. **Error Handling**: Comprehensive error handling with user-friendly messages
 4. **Validation**: Client-side and server-side validation
 5. **Persistence**: Auth state persists across browser sessions
 6. **Loading States**: Proper loading indicators during API calls
 7. **Toast Notifications**: User feedback using Sonner toast library
-8. **Unified State**: Same data structure for all authentication methods
+8. **Unified State**: Consistent data structure for all users
 
 ## Usage
 
@@ -301,23 +300,8 @@ src/
 
 - Use the logout function from `useAuth` hook
 - Clears both localStorage and Zustand stores
-- Signs out from Firebase (if OAuth user)
+- Signs out from NextAuth (if OAuth user)
 - Redirects to sign-in page
-
-## Firebase Configuration
-
-Make sure your Firebase configuration is properly set up in `src/lib/firebase.config.ts`:
-
-```typescript
-const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
-};
-```
 
 ## Security Notes
 
@@ -345,6 +329,7 @@ You can test the authentication flow by:
 
 The hybrid system provides a realistic authentication experience while allowing for both mock and real OAuth authentication methods.
 
+The mock system provides a realistic authentication experience for development and testing purposes.
 
 ### License
 
