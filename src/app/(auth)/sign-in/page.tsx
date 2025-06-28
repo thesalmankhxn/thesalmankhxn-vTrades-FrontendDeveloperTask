@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Show } from '@/components/show';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { GithubIcon, GoogleIcon } from '@/components/ui/icons';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/use-auth';
@@ -19,7 +18,7 @@ interface SignInFormData {
 }
 
 const SignInPage = () => {
-    const { isLoading, loginWithEmailPassword, loginWithGoogle, loginWithGithub } = useAuth();
+    const { isLoading, loginWithEmailPassword } = useAuth();
 
     /**
      * React Hook Form setup with validation
@@ -54,29 +53,6 @@ const SignInPage = () => {
         }
     };
 
-    /**
-     * Handles Google OAuth login
-     */
-    const handleGoogleLogin = async () => {
-        try {
-            await loginWithGoogle();
-            // Redirect is handled in the useAuth hook
-        } catch (error) {
-            console.error('Google login failed:', error);
-        }
-    };
-
-    /**
-     * Handles GitHub OAuth login
-     */
-    const handleGithubLogin = async () => {
-        try {
-            await loginWithGithub();
-            // Redirect is handled in the useAuth hook
-        } catch (error) {
-            console.error('GitHub login failed:', error);
-        }
-    };
     return (
         <>
             <form className='w-full' onSubmit={handleSubmit(onSubmit)}>
@@ -143,37 +119,6 @@ const SignInPage = () => {
                             className='mt-4 w-full'
                             disabled={isLoading || !isValid}>
                             Sign In
-                        </Button>
-                    </div>
-
-                    <div className='flex w-full max-w-[385px] items-center py-11'>
-                        <div className='h-px flex-grow bg-[#272727]'></div>
-                        <span className='px-4 text-sm text-gray-500'>or</span>
-                        <div className='h-px flex-grow bg-[#272727]'></div>
-                    </div>
-
-                    <div className={cn('flex w-full items-center gap-6', 'flex-col justify-between')}>
-                        <Button
-                            variant='outline'
-                            className={cn(
-                                'w-full gap-2 !border-[#30303D] !bg-[#1D1E26] text-sm !font-normal !text-white'
-                            )}
-                            type='button'
-                            onClick={handleGoogleLogin}
-                            disabled={isLoading}>
-                            <GoogleIcon />
-                            Sign in with Google
-                        </Button>
-                        <Button
-                            variant='outline'
-                            className={cn(
-                                'w-full gap-2 border-[#30303D] !bg-[#1D1E26] text-sm !font-normal !text-white'
-                            )}
-                            type='button'
-                            onClick={handleGithubLogin}
-                            disabled={isLoading}>
-                            <GithubIcon />
-                            Sign in with Github
                         </Button>
                     </div>
 

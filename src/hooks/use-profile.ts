@@ -5,7 +5,7 @@ import { useProfileStore } from '@/stores/use-profile-store';
  * Provides easy access to profile data and actions
  */
 export const useProfile = () => {
-    const { admin, setProfile, setProfileFromFirebaseUser, clearProfile } = useProfileStore();
+    const { admin, setProfile, clearProfile } = useProfileStore();
 
     return {
         // Profile data
@@ -14,7 +14,6 @@ export const useProfile = () => {
 
         // Profile actions
         setProfile,
-        setProfileFromFirebaseUser,
         clearProfile,
 
         // Convenience getters
