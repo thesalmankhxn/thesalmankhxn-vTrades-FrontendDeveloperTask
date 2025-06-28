@@ -1,9 +1,12 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 
 import { Button } from './ui/button';
+import { signOut } from 'next-auth/react';
 
 interface SignOutButtonProps {
     /**
@@ -41,7 +44,7 @@ export default function SignOutButton({
     showLoading = true
 }: SignOutButtonProps) {
     const { logout, isLoading, hasNextAuthSession } = useAuth();
-
+    const router = useRouter();
     /**
      * Handles the sign-out process
      * Checks for NextAuth session and performs comprehensive cleanup
@@ -57,7 +60,10 @@ export default function SignOutButton({
                 console.log('No NextAuth session found, clearing local authentication only');
             }
 
+            await signOut();
             await logout();
+
+            router.push('/sign-in');
         } catch (error) {
             console.error('Sign-out failed:', error);
         }
