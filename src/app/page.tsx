@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation';
 const HomePage = () => {
     // For now, redirect to the protected dashboard
     // In a real app, you would check authentication status here
-    redirect('/dashboard');
+    redirect('/sign-in');
 };
 
 export default HomePage;

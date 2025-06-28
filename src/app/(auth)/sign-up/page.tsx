@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { Show } from '@/components/show';
+import SignIn from '@/components/sign-in-button';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -129,6 +130,17 @@ const SignUpPage = () => {
                             disabled={isLoading || !isValid}>
                             Sign Up
                         </Button>
+                    </div>
+
+                    <div className='flex w-full max-w-[385px] items-center py-11'>
+                        <div className='h-px flex-grow bg-[#272727]'></div>
+                        <span className='px-4 text-sm text-gray-500'>or</span>
+                        <div className='h-px flex-grow bg-[#272727]'></div>
+                    </div>
+
+                    <div className={cn('flex w-full items-center gap-6', 'flex-col justify-between')}>
+                        <SignIn provider='google' />
+                        <SignIn provider='github' />
                     </div>
 
                     <div className='mt-6 flex items-center justify-center gap-2'>
