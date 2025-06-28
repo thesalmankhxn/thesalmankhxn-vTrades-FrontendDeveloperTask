@@ -6,6 +6,7 @@ import { Source_Sans_3 } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 
 import '@/app/globals.css';
+import SessionProviders from '@/providers/session-providers';
 
 // Import Source Sans Pro from Google Fonts with proper configuration
 const sourceSansPro = Source_Sans_3({
@@ -35,7 +36,7 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
         <html suppressHydrationWarning lang='en'>
             <body className={`${sourceSansPro.variable} bg-primary-bg text-foreground antialiased`}>
                 <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-                    {children}
+                    <SessionProviders>{children}</SessionProviders>
                 </ThemeProvider>
             </body>
         </html>

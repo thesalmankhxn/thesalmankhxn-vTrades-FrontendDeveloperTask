@@ -4,8 +4,10 @@ import { type ReactNode, useEffect } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import SignOutButton from '@/components/sign-out-button';
 import { Spinner } from '@/components/ui/spinner';
 import { useAuth } from '@/hooks/use-auth';
+import { useAuthStatus } from '@/hooks/use-auth-status';
 
 /**
  * Interface for DashboardLayout component props
@@ -23,15 +25,20 @@ interface DashboardLayoutProps {
  * @returns JSX.Element - The dashboard layout structure
  */
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-    const { logout, token, isLoading } = useAuth();
+    const { token, isLoading } = useAuth();
     const router = useRouter();
+    const { isAuthenticated, authMethod } = useAuthStatus();
 
+    console.log('isAuthenticated', isAuthenticated);
+    console.log('authMethod', authMethod);
+    console.log('token', token);
+    console.log('isLoading', isLoading);
     /**
      * Check authentication status and redirect if no token
      * Runs on component mount and when token changes
      */
     useEffect(() => {
-        if (!window || !token || isLoading) return;
+        if (!window || !token || isLoading || !isAuthenticated) return;
         // If no token is present, redirect to sign-in page
         if (!token) {
             console.log('No authentication token found, redirecting to sign-in');
@@ -75,11 +82,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                         </div>
                         <div className='flex items-center space-x-4'>
                             <button className='text-muted-foreground hover:text-foreground text-sm'>Profile</button>
-                            <button
-                                className='text-muted-foreground hover:text-foreground text-sm'
-                                onClick={() => logout()}>
+                            <SignOutButton
+                                variant='ghost'
+                                size='sm'
+                                className='text-muted-foreground hover:text-foreground'>
                                 Sign Out
-                            </button>
+                            </SignOutButton>
                         </div>
                     </div>
                 </div>

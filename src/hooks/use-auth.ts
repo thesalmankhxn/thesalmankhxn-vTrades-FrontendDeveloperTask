@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -11,14 +9,16 @@ import {
     saveAuthToStorage,
     saveProfileToStorage
 } from '@/lib/storage';
+import { hasNextAuthSession } from '@/lib/utils';
 import { useAuthStore } from '@/stores/use-auth-store';
 import { useProfileStore } from '@/stores/use-profile-store';
 
+import { signOut } from 'next-auth/react';
 import { toast } from 'sonner';
 
 /**
  * Custom hook for handling authentication operations
- * Uses mock APIs for email/password authentication
+ * Uses mock APIs for email/password authentication and NextAuth for OAuth
  * Integrates with Zustand store and localStorage for token and profile management
  */
 export const useAuth = () => {
@@ -200,19 +200,39 @@ export const useAuth = () => {
     };
 
     /**
-     * Handles user logout
-     * Clears localStorage and Zustand stores
+     * Handles user logout with comprehensive cleanup
+     * Checks for NextAuth session first, then clears all local data
      */
     const logout = async () => {
         setIsLoading(true);
 
         try {
-            console.log('Starting logout...');
+            console.log('Starting logout process...');
 
-            // Clear localStorage
+            // Check if NextAuth session exists
+            const hasNextAuth = hasNextAuthSession();
+
+            if (hasNextAuth) {
+                console.log('NextAuth session detected, signing out from NextAuth...');
+                try {
+                    // Sign out from NextAuth with callback URL
+                    await signOut({
+                        callbackUrl: '/sign-in',
+                        redirect: false // Handle redirect manually
+                    });
+                    console.log('NextAuth sign-out completed');
+                } catch (nextAuthError) {
+                    console.error('NextAuth sign-out error:', nextAuthError);
+                    // Continue with local cleanup even if NextAuth fails
+                }
+            }
+
+            // Clear localStorage (for custom auth)
+            console.log('Clearing local storage...');
             clearAllAuthData();
 
             // Clear Zustand stores
+            console.log('Clearing Zustand stores...');
             logoutFromStore();
             clearProfile();
 
@@ -234,6 +254,7 @@ export const useAuth = () => {
         token,
         signupWithEmailPassword,
         loginWithEmailPassword,
-        logout
+        logout,
+        hasNextAuthSession
     };
 };

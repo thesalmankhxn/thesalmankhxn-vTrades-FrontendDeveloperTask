@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { Show } from '@/components/show';
+import SignIn from '@/components/sign-in-button';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -11,7 +12,6 @@ import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 
 import { useForm } from 'react-hook-form';
-import { GithubIcon, GoogleIcon } from '@/components/ui/icons';
 
 interface SignInFormData {
     email: string;
@@ -142,28 +142,8 @@ const SignInPage = () => {
                     </div>
 
                     <div className={cn('flex w-full items-center gap-6', 'flex-col justify-between')}>
-                        <Button
-                            variant='outline'
-                            className={cn(
-                                'w-full gap-2 !border-[#30303D] !bg-[#1D1E26] text-sm !font-normal !text-white'
-                            )}
-                            type='button'
-                            // onClick={handleGoogleLogin}
-                            disabled={isLoading}>
-                            <GoogleIcon />
-                            Sign in with Google
-                        </Button>
-                        <Button
-                            variant='outline'
-                            className={cn(
-                                'w-full gap-2 border-[#30303D] !bg-[#1D1E26] text-sm !font-normal !text-white'
-                            )}
-                            type='button'
-                            // onClick={handleGithubLogin}
-                            disabled={isLoading}>
-                            <GithubIcon />
-                            Sign in with Github
-                        </Button>
+                        <SignIn provider='google' />
+                        <SignIn provider='github' />
                     </div>
 
                     <div className='mt-6 flex items-center justify-center gap-2'>
