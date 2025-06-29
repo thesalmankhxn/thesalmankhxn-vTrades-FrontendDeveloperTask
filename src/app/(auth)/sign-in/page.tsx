@@ -32,8 +32,8 @@ const SignInPage = () => {
     } = useForm<SignInFormData>({
         mode: 'onChange', // Validate on change for better UX
         defaultValues: {
-            email: '',
-            password: ''
+            email: 'tylerdurden@fightclub.com',
+            password: 'password123'
         }
     });
 
