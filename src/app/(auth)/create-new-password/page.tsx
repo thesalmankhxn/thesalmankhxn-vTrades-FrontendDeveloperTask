@@ -1,14 +1,24 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
-import { Modal } from '@/components/modal';
 import { Show } from '@/components/show';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@/components/ui/dialog';
 import { CheckedIcon } from '@/components/ui/icons';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/hooks/use-auth';
+import { usePasswordReset } from '@/hooks/use-password-reset';
 import { cn } from '@/lib/utils';
 
 import { Controller, useForm } from 'react-hook-form';
@@ -19,8 +29,9 @@ interface CreateNewPasswordFormData {
 }
 
 const CreateNewPasswordPage = () => {
-    const { isLoading } = useAuth();
     const router = useRouter();
+    const { isLoading, error, resetPassword, clearError } = usePasswordReset();
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     /**
      * React Hook Form setup with validation using Controller
@@ -45,16 +56,25 @@ const CreateNewPasswordPage = () => {
      */
     const onSubmit = async (data: CreateNewPasswordFormData) => {
         try {
-            // await sendPasswordResetEmail(auth, data.email);
+            const success = await resetPassword(data.password, data.confirmPassword);
 
-            // Reset form on successful login
-            reset();
-
-            // Redirect is handled in the useAuth hook
+            if (success) {
+                // Reset form on successful password reset
+                reset();
+                // Show success modal
+                setShowSuccessModal(true);
+            }
         } catch (error) {
-            // Error handling is done in the hook
-            console.error('Login failed:', error);
+            console.error('Password reset failed:', error);
         }
+    };
+
+    /**
+     * Handle navigation to dashboard
+     */
+    const handleNavigateToDashboard = () => {
+        setShowSuccessModal(false);
+        router.push('/dashboard');
     };
 
     const password = watch('password');
@@ -73,8 +93,8 @@ const CreateNewPasswordPage = () => {
                                 rules={{
                                     required: 'Password is required',
                                     minLength: {
-                                        value: 8,
-                                        message: 'Password must be at least 8 characters long'
+                                        value: 6,
+                                        message: 'Password must be at least 6 characters long'
                                     }
                                 }}
                                 render={({ field }) => (
@@ -121,24 +141,56 @@ const CreateNewPasswordPage = () => {
                             </Show>
                         </div>
 
-                        <Modal
-                            icon={<CheckedIcon />}
-                            title='Password Created!'
-                            description='Your password has been successfully updated. You can now use your new password to log in.'
-                            action={() => router.push('/dashboard')}
-                            trigger={
-                                <Button
-                                    variant='default'
-                                    type='submit'
-                                    className='mt-4 w-full'
-                                    disabled={isLoading || !isValid}>
-                                    Continue
-                                </Button>
-                            }
-                        />
+                        {/* Show API error if any */}
+                        <Show when={!!error} fallback={null}>
+                            <div className='rounded-md border border-red-200 bg-red-50 p-3'>
+                                <span className='text-sm text-red-600'>{error}</span>
+                                <button
+                                    type='button'
+                                    onClick={clearError}
+                                    className='ml-2 text-sm text-red-500 underline hover:text-red-700'>
+                                    Dismiss
+                                </button>
+                            </div>
+                        </Show>
+
+                        <Button
+                            variant='default'
+                            type='submit'
+                            className='mt-4 w-full'
+                            disabled={isLoading || !isValid}>
+                            {isLoading ? 'Updating...' : 'Continue'}
+                        </Button>
                     </div>
                 </div>
             </form>
+
+            {/* Success Modal - Controlled Dialog */}
+            <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+                <DialogContent className='sm:max-w-md'>
+                    <DialogHeader>
+                        <div className='mb-8 flex items-center justify-center'>
+                            <CheckedIcon />
+                        </div>
+                        <DialogTitle className='mb-3'>Password Created!</DialogTitle>
+                        <DialogDescription className='mb-3'>
+                            Your password has been successfully updated. You can now use your new password to log in.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter className='sm:justify-end'>
+                        <DialogClose asChild>
+                            <Button
+                                type='button'
+                                variant='default'
+                                className='h-[50px] w-[116px] text-base text-white'
+                                onClick={handleNavigateToDashboard}>
+                                Okay
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 };

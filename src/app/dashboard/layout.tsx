@@ -2,12 +2,9 @@
 
 import { type ReactNode, useEffect } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import SignOutButton from '@/components/sign-out-button';
 import { Spinner } from '@/components/ui/spinner';
 import { useAuth } from '@/hooks/use-auth';
-import { useAuthStatus } from '@/hooks/use-auth-status';
 
 /**
  * Interface for DashboardLayout component props
@@ -25,26 +22,22 @@ interface DashboardLayoutProps {
  * @returns JSX.Element - The dashboard layout structure
  */
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-    const { token, isLoading } = useAuth();
-    const router = useRouter();
-    const { isAuthenticated, authMethod } = useAuthStatus();
-
-    console.log('isAuthenticated', isAuthenticated);
-    console.log('authMethod', authMethod);
-    console.log('token', token);
-    console.log('isLoading', isLoading);
+    const { isLoading, isAuthenticated } = useAuth();
     /**
      * Check authentication status and redirect if no token
      * Runs on component mount and when token changes
      */
     useEffect(() => {
-        if (!window || !token || isLoading || !isAuthenticated) return;
-        // If no token is present, redirect to sign-in page
-        if (!token) {
-            console.log('No authentication token found, redirecting to sign-in');
-            router.push('/sign-in');
+        // Only check authentication after loading is complete
+        if (!isLoading) {
+            // Check if user is authenticated via any method
+            if (!isAuthenticated) {
+                console.log('No authentication found, redirecting to sign-in');
+                // Use window.location for a hard redirect to prevent navigation back
+                window.location.href = '/sign-in';
+            }
         }
-    }, [token]);
+    }, [isAuthenticated, isLoading]);
 
     // Show loading state while checking authentication
     if (isLoading) {
@@ -57,6 +50,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </div>
         );
     }
+
+    // Redirect if not authenticated (additional safety check)
+    if (!isAuthenticated) {
+        return null; // Don't render anything while redirecting
+    }
+
     return (
         <div className='bg-background min-h-screen'>
             {/* Navigation Header */}

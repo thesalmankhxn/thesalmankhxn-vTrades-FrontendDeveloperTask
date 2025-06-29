@@ -1,12 +1,13 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { Show } from '@/components/show';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useAuth } from '@/hooks/use-auth';
+import { usePasswordReset } from '@/hooks/use-password-reset';
 import { cn } from '@/lib/utils';
 
 import { TimerIcon } from 'lucide-react';
@@ -21,8 +22,12 @@ interface OTPFormData {
 }
 
 const OTPVerificationPage = () => {
-    const { isLoading } = useAuth();
     const router = useRouter();
+    const { isLoading, error, verifyOTP, clearError, requestPasswordReset } = usePasswordReset();
+
+    // Timer state
+    const [timeLeft, setTimeLeft] = useState(30);
+    const [canResend, setCanResend] = useState(false);
 
     /**
      * React Hook Form setup with validation for OTP
@@ -44,21 +49,66 @@ const OTPVerificationPage = () => {
     const otpValue = watch('otp');
 
     /**
+     * Timer effect for countdown
+     */
+    useEffect(() => {
+        if (timeLeft > 0) {
+            const timer = setTimeout(() => {
+                setTimeLeft(timeLeft - 1);
+            }, 1000);
+            return () => clearTimeout(timer);
+        } else {
+            setCanResend(true);
+        }
+    }, [timeLeft]);
+
+    /**
+     * Format time for display
+     */
+    const formatTime = (seconds: number): string => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    /**
+     * Handle resend OTP
+     */
+    const handleResendOTP = async () => {
+        const email = localStorage.getItem('password-reset-email');
+        if (!email) {
+            clearError();
+            // Show error message in the existing error display
+            return;
+        }
+
+        try {
+            const success = await requestPasswordReset(email);
+            if (success) {
+                // Reset timer
+                setTimeLeft(30);
+                setCanResend(false);
+                clearError();
+            }
+        } catch (error) {
+            console.error('Resend OTP failed:', error);
+        }
+    };
+
+    /**
      * Handles OTP verification form submission
      */
     const onSubmit = async (data: OTPFormData) => {
         try {
-            console.log('OTP submitted:', data.otp);
-            // TODO: Implement OTP verification logic here
-            // await verifyOTP(data.otp);
+            const success = await verifyOTP(data.otp);
 
-            // Reset form on successful verification
-            reset();
-
-            // Redirect to create new password page
-            router.push('/create-new-password');
+            if (success) {
+                // Reset form on successful verification
+                reset();
+                // Redirect to create new password page
+                router.push('/create-new-password');
+            }
         } catch (error) {
-            // Error handling is done in the hook
             console.error('OTP verification failed:', error);
         }
     };
@@ -100,7 +150,11 @@ const OTPVerificationPage = () => {
             <form className='w-full' onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <div className='grid gap-6'>
-                        <Label className='text-primary text-base font-normal'>Change Email Address</Label>
+                        <button
+                            onClick={() => router.push('/forgot-password')}
+                            className='text-primary mr-auto text-base font-normal'>
+                            Change Email Address
+                        </button>
                         <div className='grid gap-2'>
                             <Controller
                                 name='otp'
@@ -140,9 +194,35 @@ const OTPVerificationPage = () => {
                             </Show>
                         </div>
 
-                        <div className='my-2 flex items-center gap-2 text-[#A0A0A0]'>
-                            <TimerIcon className='size-3.5' />
-                            <span className='text-sm'>30 Sec</span>
+                        {/* Show API error if any */}
+                        <Show when={!!error} fallback={null}>
+                            <div className='rounded-md border border-red-200 bg-red-50 p-3'>
+                                <span className='text-sm text-red-600'>{error}</span>
+                                <button
+                                    type='button'
+                                    onClick={clearError}
+                                    className='ml-2 text-sm text-red-500 underline hover:text-red-700'>
+                                    Dismiss
+                                </button>
+                            </div>
+                        </Show>
+
+                        {/* Timer and Resend Section */}
+                        <div className='flex items-center justify-between'>
+                            <div className='flex items-center gap-2 text-[#A0A0A0]'>
+                                <TimerIcon className='size-3.5' />
+                                <span className='text-sm'>{canResend ? 'Resend available' : formatTime(timeLeft)}</span>
+                            </div>
+
+                            {canResend && (
+                                <button
+                                    type='button'
+                                    onClick={handleResendOTP}
+                                    disabled={isLoading}
+                                    className='text-sm text-blue-500 underline hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50'>
+                                    Resend OTP
+                                </button>
+                            )}
                         </div>
 
                         <Button
@@ -150,7 +230,7 @@ const OTPVerificationPage = () => {
                             type='submit'
                             className='mt-4 w-full'
                             disabled={isLoading || !isValid || otpValue.length !== 6}>
-                            Continue
+                            {isLoading ? 'Verifying...' : 'Continue'}
                         </Button>
                     </div>
                 </div>

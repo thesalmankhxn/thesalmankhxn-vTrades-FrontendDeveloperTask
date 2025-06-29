@@ -13,8 +13,24 @@ import { hasNextAuthSession } from '@/lib/utils';
 import { useAuthStore } from '@/stores/use-auth-store';
 import { useProfileStore } from '@/stores/use-profile-store';
 
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { toast } from 'sonner';
+
+/**
+ * Authentication status information
+ */
+interface AuthStatus {
+    /** Whether the user is authenticated via any method */
+    isAuthenticated: boolean;
+    /** Whether the user is authenticated via NextAuth OAuth */
+    isNextAuthAuthenticated: boolean;
+    /** Whether the user is authenticated via custom email/password */
+    isCustomAuthenticated: boolean;
+    /** The authentication method being used */
+    authMethod: 'nextauth' | 'custom' | 'none';
+    /** Whether the authentication status is being checked */
+    isLoading: boolean;
+}
 
 /**
  * Custom hook for handling authentication operations
@@ -23,9 +39,11 @@ import { toast } from 'sonner';
  */
 export const useAuth = () => {
     const [isLoading, setIsLoading] = useState(false);
+    const [authStatusLoading, setAuthStatusLoading] = useState(true);
     const { token, setAuthenticated, logout: logoutFromStore } = useAuthStore();
     const { setProfile, clearProfile } = useProfileStore();
     const router = useRouter();
+    const { data: session, status: sessionStatus } = useSession();
 
     /**
      * Initialize auth state from localStorage on mount
@@ -52,6 +70,35 @@ export const useAuth = () => {
 
         initializeAuth();
     }, [setAuthenticated, setProfile]);
+
+    /**
+     * Check authentication status on mount and when dependencies change
+     */
+    useEffect(() => {
+        // Check both NextAuth and custom authentication
+        const checkAuthStatus = () => {
+            const hasNextAuth = hasNextAuthSession();
+            const hasCustomAuth = !!token;
+
+            setAuthStatusLoading(false);
+        };
+
+        // Small delay to ensure all auth systems are initialized
+        const timer = setTimeout(checkAuthStatus, 100);
+        return () => clearTimeout(timer);
+    }, [token, sessionStatus]);
+
+    // Determine authentication method
+    const isNextAuthAuthenticated = sessionStatus === 'authenticated' || hasNextAuthSession();
+    const isCustomAuthenticated = !!token;
+    const isAuthenticated = isNextAuthAuthenticated || isCustomAuthenticated;
+
+    let authMethod: 'nextauth' | 'custom' | 'none' = 'none';
+    if (isNextAuthAuthenticated) {
+        authMethod = 'nextauth';
+    } else if (isCustomAuthenticated) {
+        authMethod = 'custom';
+    }
 
     /**
      * Handles email/password signup using mock API
@@ -111,8 +158,8 @@ export const useAuth = () => {
             console.log('Signup successful:', data.profile.admin.email);
             toast.success('Account created successfully! Welcome!');
 
-            // Redirect to home page
-            router.push('/');
+            // Redirect to dashboard page
+            router.push('/dashboard');
 
             return data;
         } catch (error: unknown) {
@@ -181,8 +228,8 @@ export const useAuth = () => {
             console.log('Login successful:', data.profile.admin.email);
             toast.success('Login successful! Welcome back!');
 
-            // Redirect to home page
-            router.push('/');
+            // Redirect to dashboard page
+            router.push('/dashboard');
 
             return data;
         } catch (error: unknown) {
@@ -236,25 +283,40 @@ export const useAuth = () => {
             logoutFromStore();
             clearProfile();
 
+            // Clear any remaining cookies that might cause issues
+            if (typeof document !== 'undefined') {
+                // Clear any custom auth cookies if they exist
+                document.cookie = 'auth-token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+                document.cookie = 'profile=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+            }
+
             console.log('Logout completed successfully');
             toast.success('Logged out successfully');
 
-            // Redirect to Sign In page
-            router.push('/sign-in');
+            // Force redirect to Sign In page to prevent navigation back to dashboard
+            window.location.href = '/sign-in';
         } catch (error) {
             console.error('Logout error:', error);
             toast.error('Logout failed. Please try again');
+            // Force redirect even on error to ensure user is signed out
+            window.location.href = '/sign-in';
         } finally {
             setIsLoading(false);
         }
     };
 
     return {
-        isLoading,
         token,
         signupWithEmailPassword,
         loginWithEmailPassword,
         logout,
-        hasNextAuthSession
+        hasNextAuthSession,
+        // Auth status properties
+        session,
+        isAuthenticated,
+        isNextAuthAuthenticated,
+        isCustomAuthenticated,
+        authMethod,
+        isLoading: isLoading || authStatusLoading || sessionStatus === 'loading'
     };
 };
