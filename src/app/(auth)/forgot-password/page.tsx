@@ -1,14 +1,24 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
-import { Modal } from '@/components/modal';
 import { Show } from '@/components/show';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@/components/ui/dialog';
 import { EmailIcon } from '@/components/ui/icons';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/hooks/use-auth';
+import { usePasswordReset } from '@/hooks/use-password-reset';
 import { cn } from '@/lib/utils';
 
 import { useForm } from 'react-hook-form';
@@ -18,8 +28,10 @@ interface ForgotPasswordFormData {
 }
 
 const ForgotPasswordPage = () => {
-    const { isLoading } = useAuth();
     const router = useRouter();
+    const { isLoading, error, requestPasswordReset, clearError } = usePasswordReset();
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
     /**
      * React Hook Form setup with validation
      */
@@ -36,20 +48,29 @@ const ForgotPasswordPage = () => {
     });
 
     /**
-     * Handles form submission for email/password login
+     * Handles form submission for password reset request
      */
     const onSubmit = async (data: ForgotPasswordFormData) => {
         try {
-            // await sendPasswordResetEmail(auth, data.email);
+            const success = await requestPasswordReset(data.email);
 
-            // Reset form on successful login
-            reset();
-
-            // Redirect is handled in the useAuth hook
+            if (success) {
+                // Reset form on successful request
+                reset();
+                // Show success modal
+                setShowSuccessModal(true);
+            }
         } catch (error) {
-            // Error handling is done in the hook
-            console.error('Login failed:', error);
+            console.error('Password reset request failed:', error);
         }
+    };
+
+    /**
+     * Handle navigation to OTP verification
+     */
+    const handleNavigateToOTP = () => {
+        setShowSuccessModal(false);
+        router.push('/otp-verification');
     };
 
     return (
@@ -77,24 +98,56 @@ const ForgotPasswordPage = () => {
                             </Show>
                         </div>
 
-                        <Modal
-                            icon={<EmailIcon />}
-                            title='Link Sent Successfully'
-                            description='Check your inbox! We’ve sent you an email with instructions to reset your password.'
-                            action={() => router.push('/otp-verification')}
-                            trigger={
-                                <Button
-                                    variant='default'
-                                    type='submit'
-                                    className='mt-4 w-full'
-                                    disabled={isLoading || !isValid}>
-                                    Submit
-                                </Button>
-                            }
-                        />
+                        {/* Show API error if any */}
+                        <Show when={!!error} fallback={null}>
+                            <div className='rounded-md border border-red-200 bg-red-50 p-3'>
+                                <span className='text-sm text-red-600'>{error}</span>
+                                <button
+                                    type='button'
+                                    onClick={clearError}
+                                    className='ml-2 text-sm text-red-500 underline hover:text-red-700'>
+                                    Dismiss
+                                </button>
+                            </div>
+                        </Show>
+
+                        <Button
+                            variant='default'
+                            type='submit'
+                            className='mt-4 w-full'
+                            disabled={isLoading || !isValid}>
+                            {isLoading ? 'Sending...' : 'Submit'}
+                        </Button>
                     </div>
                 </div>
             </form>
+
+            {/* Success Modal - Controlled Dialog */}
+            <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+                <DialogContent className='sm:max-w-md'>
+                    <DialogHeader>
+                        <div className='mb-8 flex items-center justify-center'>
+                            <EmailIcon />
+                        </div>
+                        <DialogTitle className='mb-3'>Link Sent Successfully</DialogTitle>
+                        <DialogDescription className='mb-3'>
+                            Check your inbox! We've sent you an email with instructions to reset your password.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter className='sm:justify-end'>
+                        <DialogClose asChild>
+                            <Button
+                                type='button'
+                                variant='default'
+                                className='h-[50px] w-[116px] text-base text-white'
+                                onClick={handleNavigateToOTP}>
+                                Okay
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 };

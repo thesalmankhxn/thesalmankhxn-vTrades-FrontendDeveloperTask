@@ -1,47 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-/**
- * Mock user database for authentication
- * In a real application, this would be a database
- */
-let mockUsers = [
-    {
-        email: 'tylerdurden@fightclub.com',
-        password: 'password123',
-        uid: 'on7zjqhpY7ZN64IuB63M47X8zrg2',
-        name: 'Tyler Durden',
-        initialPasswordChangeAt: null
-    },
-    {
-        email: 'test@example.com',
-        password: 'test123',
-        uid: 'test-user-123',
-        name: 'Test User',
-        initialPasswordChangeAt: null
-    }
-];
-
-/**
- * Generate a unique user ID
- * In a real application, this would be handled by the database
- */
-const generateUID = (): string => {
-    return `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-};
-
-/**
- * Generate a display name from email
- * @param email - User's email address
- * @returns Generated display name
- */
-const generateDisplayName = (email: string): string => {
-    const username = email.split('@')[0];
-    // Capitalize first letter and replace common separators with spaces
-    return username
-        .replace(/[._-]/g, ' ')
-        .replace(/\b\w/g, (l) => l.toUpperCase())
-        .trim();
-};
+import { generateDisplayName, generateUID, mockUsers } from '@/lib/mock-data';
 
 /**
  * Mock sign-up API endpoint

@@ -60,12 +60,15 @@ export default function SignOutButton({
                 console.log('No NextAuth session found, clearing local authentication only');
             }
 
-            await signOut();
+            // Perform logout operations
             await logout();
 
-            router.push('/sign-in');
+            // Force redirect to sign-in page to prevent any navigation back to dashboard
+            window.location.href = '/sign-in';
         } catch (error) {
             console.error('Sign-out failed:', error);
+            // Force redirect even on error to ensure user is signed out
+            window.location.href = '/sign-in';
         }
     };
 

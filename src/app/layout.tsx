@@ -8,6 +8,8 @@ import { ThemeProvider } from 'next-themes';
 import '@/app/globals.css';
 import SessionProviders from '@/providers/session-providers';
 
+import { Toaster } from 'sonner';
+
 // Import Source Sans Pro from Google Fonts with proper configuration
 const sourceSansPro = Source_Sans_3({
     subsets: ['latin'],
@@ -37,6 +39,7 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
             <body className={`${sourceSansPro.variable} bg-primary-bg text-foreground antialiased`}>
                 <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
                     <SessionProviders>{children}</SessionProviders>
+                    <Toaster position='top-right' richColors />
                 </ThemeProvider>
             </body>
         </html>

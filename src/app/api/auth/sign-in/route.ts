@@ -1,25 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-/**
- * Mock user database for authentication
- * In a real application, this would be a database query
- */
-const mockUsers = [
-    {
-        email: 'tylerdurden@fightclub.com',
-        password: 'password123', // In real app, this would be hashed
-        uid: 'on7zjqhpY7ZN64IuB63M47X8zrg2',
-        name: 'Tyler Durden',
-        initialPasswordChangeAt: null
-    },
-    {
-        email: 'test@example.com',
-        password: 'test123',
-        uid: 'test-user-123',
-        name: 'Test User',
-        initialPasswordChangeAt: null
-    }
-];
+import { mockUsers } from '@/lib/mock-data';
 
 /**
  * Mock sign-in API endpoint
@@ -37,6 +18,8 @@ export async function POST(request: NextRequest) {
 
         // Find user in mock database
         const user = mockUsers.find((u) => u.email === email);
+
+        console.log('user', user);
 
         // Check if user exists and password matches
         if (!user || user.password !== password) {

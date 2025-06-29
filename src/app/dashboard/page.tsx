@@ -1,45 +1,47 @@
+'use client';
+
+import { useAuth } from '@/hooks/use-auth';
+
 /**
  * Dashboard page component
- * Main dashboard interface for authenticated users
- *
- * @returns JSX.Element - The dashboard page content
+ * Displays main dashboard content for authenticated users
  */
-const DashboardPage = () => {
+export default function DashboardPage() {
+    const { isAuthenticated, authMethod, session, token } = useAuth();
+
     return (
         <div className='mx-auto w-full max-w-[1440px] px-4 py-8'>
             <div className='mb-8'>
-                <h2 className='text-foreground text-2xl font-bold'>Overview</h2>
-                <p className='text-muted-foreground mt-2'>Get a quick overview of your workforce management</p>
+                <h1 className='text-3xl font-bold'>Dashboard</h1>
+                <p className='text-muted-foreground mt-2'>Welcome to your vTrades dashboard</p>
             </div>
 
+            {/* Debug information - remove in production */}
+            <div className='bg-card mb-6 rounded-lg border p-4'>
+                <h3 className='mb-2 font-semibold'>Authentication Status (Debug)</h3>
+                <div className='space-y-1 text-sm'>
+                    <p>Authenticated: {isAuthenticated ? 'Yes' : 'No'}</p>
+                    <p>Auth Method: {authMethod}</p>
+                    <p>Has Token: {token ? 'Yes' : 'No'}</p>
+                    <p>Has Session: {session ? 'Yes' : 'No'}</p>
+                </div>
+            </div>
+
+            {/* Main dashboard content */}
             <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-                {/* Employee Management Card */}
-                <div className='bg-card rounded-lg border p-6 shadow-sm'>
-                    <h3 className='text-card-foreground mb-2 text-lg font-semibold'>Employee Management</h3>
-                    <p className='text-muted-foreground mb-4 text-sm'>
-                        View detailed profiles, track performance, and manage attendance
-                    </p>
-                    <button className='text-primary text-sm hover:underline'>View Employees →</button>
+                <div className='bg-card rounded-lg border p-6'>
+                    <h3 className='mb-2 font-semibold'>Quick Stats</h3>
+                    <p className='text-muted-foreground'>Your dashboard statistics will appear here</p>
                 </div>
-
-                {/* Performance Insights Card */}
-                <div className='bg-card rounded-lg border p-6 shadow-sm'>
-                    <h3 className='text-card-foreground mb-2 text-lg font-semibold'>Performance Insights</h3>
-                    <p className='text-muted-foreground mb-4 text-sm'>Analyze team goals, progress, and achievements</p>
-                    <button className='text-primary text-sm hover:underline'>View Analytics →</button>
+                <div className='bg-card rounded-lg border p-6'>
+                    <h3 className='mb-2 font-semibold'>Recent Activity</h3>
+                    <p className='text-muted-foreground'>Recent activities will be displayed here</p>
                 </div>
-
-                {/* Attendance & Leaves Card */}
-                <div className='bg-card rounded-lg border p-6 shadow-sm'>
-                    <h3 className='text-card-foreground mb-2 text-lg font-semibold'>Attendance & Leaves</h3>
-                    <p className='text-muted-foreground mb-4 text-sm'>
-                        Track attendance patterns and manage leave requests
-                    </p>
-                    <button className='text-primary text-sm hover:underline'>Manage Attendance →</button>
+                <div className='bg-card rounded-lg border p-6'>
+                    <h3 className='mb-2 font-semibold'>Notifications</h3>
+                    <p className='text-muted-foreground'>Important notifications will appear here</p>
                 </div>
             </div>
         </div>
     );
-};
-
-export default DashboardPage;
+}
