@@ -2,8 +2,6 @@
 
 import { type ReactNode, useEffect } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import SignOutButton from '@/components/sign-out-button';
 import { Spinner } from '@/components/ui/spinner';
 import { useAuth } from '@/hooks/use-auth';
@@ -24,14 +22,7 @@ interface DashboardLayoutProps {
  * @returns JSX.Element - The dashboard layout structure
  */
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-    const { token, isLoading, isAuthenticated, authMethod, session } = useAuth();
-    const router = useRouter();
-
-    console.log('isAuthenticated', isAuthenticated);
-    console.log('authMethod', authMethod);
-    console.log('token', token);
-    console.log('isLoading', isLoading);
-    console.log('session', session);
+    const { isLoading, isAuthenticated } = useAuth();
     /**
      * Check authentication status and redirect if no token
      * Runs on component mount and when token changes
@@ -47,8 +38,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             }
         }
     }, [isAuthenticated, isLoading]);
-    console.log('isAuthenticated', isAuthenticated);
-    console.log('sessionStatus', session);
 
     // Show loading state while checking authentication
     if (isLoading) {
