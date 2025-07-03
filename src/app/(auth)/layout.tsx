@@ -71,7 +71,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
                 </div>
 
                 {/* Form Section */}
-                <div className='flex w-full items-center justify-center py-10 sm:p-8 md:w-1/2 md:p-12 md:pt-0'>
+                <div className='flex w-full items-center justify-center py-10 sm:p-8 md:w-1/2 md:p-12'>
                     <div className='mx-auto w-full max-w-[385px]'>
                         <h2 className='mb-2 text-2xl leading-snug font-semibold sm:text-3xl md:text-[32px] md:leading-[48px]'>
                             {title}
